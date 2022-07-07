@@ -1,0 +1,30 @@
+{
+  "name": "skatepark",
+  "version": "1.0.0",
+  "description": "Prueba - Skate Park",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0x0012/Prueba---Skate-Park.git"
+  },
+  "keywords": [
+    "prueba",
+    "skate",
+    "park"
+  ],
+  "author": "Max Coronado Lorca",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/0x0012/Prueba---Skate-Park/issues"
+  },
+  "homepage": "https://github.com/0x0012/Prueba---Skate-Park#readme",
+  "dependencies": {
+    "bootstrap": "^5.1.3",
+    "express": "^4.18.1",
+    "express-handlebars": "^6.0.6"
+  }
+}
