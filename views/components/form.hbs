@@ -3,35 +3,41 @@
     <div class="form-group row w-50 m-auto mb-4">
       <div class="form-group col-12 col-sm-6">
         <label>Email</label>
-        <input type="email" pattern=".+@globex\.com" size="30" class="form-control m-auto mb-4">
+        <input id="frm-email" type="email" size="30" class="form-control m-auto mb-4">
       </div>
       <div class="form-group col-12 col-sm-6">
         <label>Nombre</label>
-        <input class="form-control m-auto mb-4">
+        <input id="frm-nombre" class="form-control m-auto mb-4">
       </div>
       <div class="form-group col-12 col-sm-6">
         <label>Password</label>
-        <input type="password" class="form-control m-auto mb-4">
+        <input id="frm-password" type="password" class="form-control m-auto mb-4">
       </div>
       <div class="form-group col-12 col-sm-6">
         <label>Repita la password</label>
-        <input type="password" class="form-control m-auto mb-4">
+        <input id="frm-repassword" type="password" class="form-control m-auto mb-4">
       </div>
       <div class="form-group col-12 col-sm-6">
         <label>Años de experiencia</label>
-        <input type="number" class="form-control m-auto mb-4">
+        <input id="frm-experiencia" type="number" class="form-control m-auto mb-4">
       </div>
       <div class="form-group col-12 col-sm-6">
         <label>Especialidad</label>
-        <input class="form-control m-auto mb-4">
+        <input id="frm-especialidad" class="form-control m-auto mb-4">
       </div>
+      {{#if register}}
       <div class="form-group col-12 col-sm-12">
         <label>Foto de perfil</label>
-        <input type="file" accept="image/png, image/jpeg">
+        <input id="frm-img" type="file" accept="image/png, image/jpeg">
       </div>
+      {{/if}}
     </div>
-    <div class="mb-4"><button class="btn btn-success">Registrarme</button></div>
-    <div class="mb-4"><button class="btn btn-primary">Actualizar</button></div>
-    <div class="mb-4"><button class="btn btn-danger">Eliminar cuenta</button></div>
+    {{#if register }}
+    <div class="mb-4"><button id="frm-register" class="btn btn-success">Registrarme</button></div>
+    {{/if}}
+    {{#if edit}}
+    <div class="mb-4"><button id="frm-update" class="btn btn-primary">Actualizar</button></div>
+    <div class="mb-4"><button id="frm-delete" class="btn btn-danger">Eliminar cuenta</button></div>
+    {{/if}}
   </form>
 </div>
