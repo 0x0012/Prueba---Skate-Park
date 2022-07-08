@@ -15,6 +15,19 @@ const pool = new Pool({
   port: 5432
 })
 
+// Valida un password para un email espeficado
+const isValidLogin = async (email, password) => {
+  try {
+    const { rows: result } = await pool.query(`
+      SELECT password FROM skaters WHERE email = '${email}' 
+    `)
+    return password === result[0].password
+  } catch (err) {
+    console.error('ERROR ->', { CODE: err.code, MESSAGE: err.message })
+    throw err
+  }
+}
+
 // Devuelve todos los registros de skaters
 const getSkaters = async _ => {
   try {
@@ -45,4 +58,4 @@ const newSkater = async skater => {
   }
 }
 
-module.exports = { getSkaters, newSkater }
+module.exports = { isValidLogin, getSkaters, newSkater }

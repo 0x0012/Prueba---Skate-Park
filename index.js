@@ -9,7 +9,8 @@ const { engine } = require('express-handlebars')
 const bodyParser = require('body-parser')
 const expressFileUpload = require('express-fileupload')
 const path = require('path')
-const { getSkaters, newSkater } = require('./queries')
+const jwt = require('jsonwebtoken')
+const { isValidLogin, getSkaters, newSkater } = require('./queries')
 
 const app = express()
 
@@ -49,7 +50,27 @@ app.set('view engine', 'hbs')
 // Disponibiliza rutas por defecto
 app.get('/', (_, res) => res.render('index', { layout: 'index' }))
 app.get('/login', (_, res) => res.render('login', { layout: 'login' }))
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body
+  try {
+    if (await isValidLogin(email, password)) {
+      const token = jwt.sign(
+        {
+          exp: Math.floor(Date.now() / 1000) + 300,
+          data: { email, password }
+        },
+        'ALFAOMEGAROJO'
+      )
+      res.send(token)
+    } else {
+      res.send(false)
+    }
+  } catch (err) {
+    res.send(false)
+  }
+})
 app.get('/register', (_, res) => res.render('register', { layout: 'register' }))
+app.get('/edit', (_, res) => res.render('edit', { layout: 'edit' }))
 
 // Disponibiliza rutas APIRESTful
 app.get('/api/skaters', async (_, res) => {

@@ -4,10 +4,12 @@
  * @description Script Cliente
  */
 
+// Obtiene registros de skater al cargar la ruta /
 $(document).ready( _ => {
   getSkaters()  // TODO: exec only on /
 })
 
+// Obtiene registro de skater y los muetra en la tabla
 const getSkaters = async _ => {
   await axios.get('/api/skaters')
     .then( data => {
@@ -30,6 +32,7 @@ const getSkaters = async _ => {
     })
 }
 
+// Boton de registrar usuario en /register
 $('#frm-register').click(async event => {
   event.preventDefault()
   if (validateForm()) {
@@ -51,11 +54,34 @@ $('#frm-register').click(async event => {
   }
 })
 
+// Boton de iniciar sesion en /login
+$('#login-button').click(async event => {
+  event.preventDefault()
+  if (_isMail($('#login-email').val()) && $('#login-password').val() !== '') {
+    await axios.post('/login', {
+      email: $('#login-email').val(),
+      password: $('#login-password').val()
+    })
+      .then( t => {
+        const token = t.data
+        if (token) {
+          localStorage.setItem('token', JSON.stringify(token))
+          window.location = '/edit'
+        } else {
+          alert('El email del skater no existe o el password es incorrecto')
+        }
+      })
+  } else {
+    alert('Ingrese correctamente todos los campos')
+  }
+})
+
+// Valida el contenido del formulario
 const validateForm = _ => {
-  const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  const isMail = pattern.test($('#frm-email').val())
-  const areSamePassword = $('#frm-password').val() === $('#frm-repassword').val()
-  const notEmpty = _ => {  
+  const isMail = _isMail($('#frm-email').val()) // Valida direccion de correo
+  const areSamePassword = $('#frm-password').val() === $('#frm-repassword').val() // Verifica que los dos password ingresados sean los mismos
+  // Valida que ninguno de los campos este vacio
+  const notEmpty = _ => {
     if ($('#frm-nombre').val() === '') return false
     if ($('#frm-experiencia').val() === '') return false
     if ($('#frm-especialidad').val() === '') return false
@@ -64,6 +90,7 @@ const validateForm = _ => {
     return true 
   }
   
+  // Devuelve true si pasa validacion, sino false y muestra mensaje al cliente
   if (isMail && areSamePassword && notEmpty()) {
     return true
   } else {
@@ -77,4 +104,10 @@ const validateForm = _ => {
     alert(msg())
     return false
   }
+}
+
+// Valida si una cadena de texto corresponde a una direccion de email valida
+const _isMail = string => {
+  const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  return pattern.test(string)
 }
