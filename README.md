@@ -5,6 +5,7 @@
 > * Install and configure [PostgreSQL](https://www.postgresql.org/)
 > * Clone this: `git clone https://github.com/0x0012/Desafio---Skate-Park`
 > * Import *skatepark.sql* database file to PostgreSQL
+> * Change Database credentials config in *queries.js* file
 > * Inicialice NPM on root folder project: `npm install`
 > * Run server: `node ./index.js`
 > * Open http://localhost:3000
