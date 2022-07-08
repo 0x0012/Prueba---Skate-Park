@@ -6,7 +6,9 @@
 
 // Obtiene registros de skater al cargar la ruta /
 $(document).ready( _ => {
-  getSkaters()  // TODO: exec only on /
+  const header = $('h2').text()
+  if (header == 'Lista de Participantes') getSkaters()
+  if (header == 'Datos del perfil') alert(skaterEmail)
 })
 
 // Obtiene registro de skater y los muetra en la tabla
@@ -66,7 +68,7 @@ $('#login-button').click(async event => {
         const token = t.data
         if (token) {
           localStorage.setItem('token', JSON.stringify(token))
-          window.location = '/edit'
+          window.location = `/edit?token=${token}`
         } else {
           alert('El email del skater no existe o el password es incorrecto')
         }
@@ -80,6 +82,7 @@ $('#login-button').click(async event => {
 const validateForm = _ => {
   const isMail = _isMail($('#frm-email').val()) // Valida direccion de correo
   const areSamePassword = $('#frm-password').val() === $('#frm-repassword').val() // Verifica que los dos password ingresados sean los mismos
+  
   // Valida que ninguno de los campos este vacio
   const notEmpty = _ => {
     if ($('#frm-nombre').val() === '') return false
@@ -90,7 +93,7 @@ const validateForm = _ => {
     return true 
   }
   
-  // Devuelve true si pasa validacion, sino false y muestra mensaje al cliente
+  // Devuelve true si pasa validacion, sino muestra mensaje al cliente y devuelve false
   if (isMail && areSamePassword && notEmpty()) {
     return true
   } else {

@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 // Lanza servidor
-app.listen(3000, console.log('(⌐■_■) SERVER ONLINE >>', {port: 3000, url: 'http://localhost:3000'}))
+app.listen(3000, console.log('(⌐■_■) SERVER ONLINE >>', { port: 3000, url: 'http://localhost:3000' }))
 
 // Disponibiza rutas para carpeta publica, bootstrap, jquery y axios
 app.use(express.static('public'))
@@ -47,8 +47,14 @@ app.engine(
 
 app.set('view engine', 'hbs')
 
-// Disponibiliza rutas por defecto
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Disponibiliza rutas por defecto
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+// Ruta raiz 
 app.get('/', (_, res) => res.render('index', { layout: 'index' }))
+
+// Rutas para el inicio de sesion
 app.get('/login', (_, res) => res.render('login', { layout: 'login' }))
 app.post('/login', async (req, res) => {
   const { email, password } = req.body
@@ -69,15 +75,34 @@ app.post('/login', async (req, res) => {
     res.send(false)
   }
 })
-app.get('/register', (_, res) => res.render('register', { layout: 'register' }))
-app.get('/edit', (_, res) => res.render('edit', { layout: 'edit' }))
 
-// Disponibiliza rutas APIRESTful
+// Ruta para el registro de un nuevo skater
+app.get('/register', (_, res) => res.render('register', { layout: 'register' }))
+
+// Ruta para la edicion de un skater logeado
+app.get('/edit', (req, res) => {
+  const { token } = req.query
+  jwt.verify(token, 'ALFAOMEGAROJO', (err, decoded) => {
+    err
+      ? res.status(401).send({
+          error: '401 Unauthorized',
+          message: err.message
+        })
+      : res.render('edit', { layout: 'edit', email: decoded.data.email })
+  })
+})
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Disponibiliza rutas APIRESTful
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+//Ruta para obtener listado de todos los registros
 app.get('/api/skaters', async (_, res) => {
   const respond = await getSkaters()
   res.send(respond)
 })
 
+// Ruta para crear un nuevo registro
 app.post('/api/skater', async (req, res) => {
   try {
     const { imgFile } = req.files
