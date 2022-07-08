@@ -4,12 +4,25 @@
  * @description Script Cliente
  */
 
-// Obtiene registros de skater al cargar la ruta /
+// Obtiene registro de skater al cargar
 $(document).ready( _ => {
   const header = $('h2').text()
   if (header == 'Lista de Participantes') getSkaters()
-  if (header == 'Datos del perfil') alert(skaterEmail)
+  if (header == 'Datos del perfil') getSkaterData(skaterEmail)
 })
+
+// Obtiene los datos de un usuario especificando su email
+const getSkaterData = async email => {
+  await axios.get('api/skater/' + email)
+    .then( data => {
+      const skater = data.data[0]
+      $('#frm-email').val(skater.email)
+      $('#frm-email').attr('disabled', 'disabled')
+      $('#frm-nombre').val(skater.nombre)
+      $('#frm-experiencia').val(skater.anos_experiencia)
+      $('#frm-especialidad').val(skater.especialidad)
+    })
+}
 
 // Obtiene registro de skater y los muetra en la tabla
 const getSkaters = async _ => {
@@ -37,7 +50,7 @@ const getSkaters = async _ => {
 // Boton de registrar usuario en /register
 $('#frm-register').click(async event => {
   event.preventDefault()
-  if (validateForm()) {
+  if (validateRegisterForm()) {
     const imgFile = $('#frm-img')[0].files[0]
     const data = {
       email: $('#frm-email').val(),
@@ -52,8 +65,43 @@ $('#frm-register').click(async event => {
       headers: {
         'content-type': 'multipart/form-data'
       }
-    }).then( _ => alert('oki'))
+    }).then(d => {
+        alert(d.data)
+        window.location = '/'
+      })
   }
+})
+
+// Boton de actualizar usuario en /edit
+$('#frm-update').click(async event => {
+  event.preventDefault()
+  if (validateUpdateForm()) {
+    const token = JSON.parse(localStorage.getItem('token'))
+    const data = {
+      email: $('#frm-email').val(),
+      nombre: $('#frm-nombre').val(),
+      password: $('#frm-password').val(),
+      experiencia: $('#frm-experiencia').val(),
+      especialidad: $('#frm-especialidad').val()
+    }
+    await axios.put(`/api/skater?token=${token}`, data)
+      .then(d => {
+        alert(d.data)
+        window.location = '/'
+      })
+  }
+})
+
+// Boton para borrar usuario en /edit
+$('#frm-delete').click(async event => {
+  event.preventDefault()
+  const token = JSON.parse(localStorage.getItem('token'))
+  const email = $('#frm-email').val()
+  await axios.delete(`/api/skater/${email}?token=${token}`)
+    .then(d => {
+      alert(d.data)
+      window.location = '/'
+    })
 })
 
 // Boton de iniciar sesion en /login
@@ -78,8 +126,8 @@ $('#login-button').click(async event => {
   }
 })
 
-// Valida el contenido del formulario
-const validateForm = _ => {
+// Valida el contenido del formulario de registro
+const validateRegisterForm = _ => {
   const isMail = _isMail($('#frm-email').val()) // Valida direccion de correo
   const areSamePassword = $('#frm-password').val() === $('#frm-repassword').val() // Verifica que los dos password ingresados sean los mismos
   
@@ -100,6 +148,34 @@ const validateForm = _ => {
     const msg = _ => {
       let msg = 'Por favor corrija los siguientes problemas: '
       if (!isMail) msg += '<< La dirección de email no es válida >> '
+      if (!areSamePassword) msg += '<< El password no es el mismo >> ' 
+      if (!notEmpty()) msg += '<< Se deben completar todos los campos >> '
+      return msg
+    }
+    alert(msg())
+    return false
+  }
+}
+
+// Valida el contenido del formulario de actualizacion
+const validateUpdateForm = _ => {
+  const areSamePassword = $('#frm-password').val() === $('#frm-repassword').val() // Verifica que los dos password ingresados sean los mismos
+  
+  // Valida que ninguno de los campos este vacio
+  const notEmpty = _ => {
+    if ($('#frm-nombre').val() === '') return false
+    if ($('#frm-experiencia').val() === '') return false
+    if ($('#frm-especialidad').val() === '') return false
+    if ($('#frm-password').val() === '') return false
+    return true 
+  }
+  
+  // Devuelve true si pasa validacion, sino muestra mensaje al cliente y devuelve false
+  if (areSamePassword && notEmpty()) {
+    return true
+  } else {
+    const msg = _ => {
+      let msg = 'Por favor corrija los siguientes problemas: '
       if (!areSamePassword) msg += '<< El password no es el mismo >> ' 
       if (!notEmpty()) msg += '<< Se deben completar todos los campos >> '
       return msg

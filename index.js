@@ -10,7 +10,7 @@ const bodyParser = require('body-parser')
 const expressFileUpload = require('express-fileupload')
 const path = require('path')
 const jwt = require('jsonwebtoken')
-const { isValidLogin, getSkaters, newSkater } = require('./queries')
+const { isValidLogin, getSkater, getSkaters, newSkater, updateSkater, deleteSkater } = require('./queries')
 
 const app = express()
 
@@ -108,9 +108,54 @@ app.post('/api/skater', async (req, res) => {
     const { imgFile } = req.files
     const skater = req.body
     imgFile.mv(path.join(__dirname,'public/img/', imgFile.name))
-    respond = await newSkater(skater)
-    res.send(respond)
-  } catch (err) {
-    res.send(err)
+    await newSkater(skater)
+    res.send('Registro creado con exito')
+  } catch {
+    res.send('No se pudo realizar el registro')
   }
+})
+
+// Ruta para obtener datos de un registro dato su email
+app.get('/api/skater/:email', async (req, res) => {
+  const { email } = req.params
+  const respond = await getSkater(email)
+  res.send(respond)
+})
+
+// Ruta para la edicion de un skater
+app.put('/api/skater', (req, res) => {
+  const { token } = req.query
+  const skater = req.body
+  
+  jwt.verify(token, 'ALFAOMEGAROJO', async (err, decoded) => {
+    if (err) {
+      res.send('No se pudo actualizar el registro: Sin permiso o permiso expirado')
+    } else {
+      try {
+        await updateSkater(skater)
+        res.send('Registro actualizado con exito')
+      } catch {
+        res.send('No se pudo actualizar el registro')
+      }
+    }
+  })
+})
+
+// Ruta para eliminar un skater
+app.delete('/api/skater/:email', (req, res) => {
+  const { token } = req.query
+  const { email } = req.params
+  
+  jwt.verify(token, 'ALFAOMEGAROJO', async (err, decoded) => {
+    if (err) {
+      res.send('No se pudo eliminar el registro: Sin permiso o permiso expirado')
+    } else {
+      try {
+        await deleteSkater(email)
+        res.send('Registro eliminado con exito')
+      } catch {
+        res.send('No se pudo eliminar el registro')
+      }
+    }
+  })
 })
